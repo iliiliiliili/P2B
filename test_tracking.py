@@ -41,6 +41,9 @@ def test(loader,model,epoch=-1,shape_aggregation="",reference_BB="",model_fusion
     dataset = loader.dataset
     batch_num = 0
 
+    total_time = 0
+    total_count = 0
+
     with tqdm(enumerate(loader), total=len(loader.dataset.list_of_anno)) as t:
         for batch in loader:          
             batch_num = batch_num+1
@@ -63,6 +66,9 @@ def test(loader,model,epoch=-1,shape_aggregation="",reference_BB="",model_fusion
                         model_PC = utils.getModel([this_PC], [this_BB], offset=dataset.offset_BB, scale=dataset.scale_BB)
 
                     else:
+
+                        fps_time = time.time()
+
                         previous_BB = BBs[i - 1]
 
                         # DEFINE REFERENCE BB
@@ -108,6 +114,10 @@ def test(loader,model,epoch=-1,shape_aggregation="",reference_BB="",model_fusion
                         box = utils.getOffsetBB(ref_BB,estimation_box_cpu)
                         results_BBs.append(box)
 
+                        fps_time = time.time() - fps_time
+                        total_time += fps_time
+                        total_count += 1
+
                     # estimate overlap/accuracy fro current sample
                     this_overlap = estimateOverlap(BBs[i], results_BBs[-1], dim=IoU_Space)
                     this_accuracy = estimateAccuracy(BBs[i], results_BBs[-1], dim=IoU_Space)
@@ -140,6 +150,8 @@ def test(loader,model,epoch=-1,shape_aggregation="",reference_BB="",model_fusion
                                   '{:.1f}'.format(Precision_batch.average))
                 Success_batch.reset()
                 Precision_batch.reset()
+
+    print("FPS =", total_count / total_time)
 
     return Success_main.average, Precision_main.average
 
