@@ -171,8 +171,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print (args)
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = '1,2'
-
     logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%Y/%m/%d %H:%M:%S', \
                     filename=os.path.join(args.save_root_dir, datetime.now().strftime('%Y-%m-%d %H-%M-%S.log')), level=logging.INFO)
     logging.info('======================================================')
